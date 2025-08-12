@@ -97,3 +97,6 @@ This project was developed for the Odoo Hackathon 2025 by Team 217.
 ## License
 
 This project is part of the Odoo Hackathon 2025 submission.
+
+
+- **Video Link**: (https://drive.google.com/file/d/1KLIHf8CddYtERUejjbMb3mIWPs-Enx4o/view?usp=sharing)
