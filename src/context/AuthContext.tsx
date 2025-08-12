@@ -8,7 +8,7 @@ interface AuthContextType extends AuthState {
   logout: () => void;
   verifyOTP: (otp: string) => Promise<boolean>;
   setUser: (user: User | null) => void;
-  loginWithGoogle: () => Promise<boolean>;
+  loginWithGoogle: (role?: 'user' | 'owner' | 'admin') => Promise<boolean>;
   resetPassword: (email: string) => Promise<void>;
 }
 
@@ -51,53 +51,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string, role: 'user' | 'owner' | 'admin'): Promise<boolean> => {
     try {
-      if (!auth) {
-        throw new Error('Email/password auth is not configured.');
-      }
-
-      // Try to sign in. If user not found, create account then sign in
-      let cred;
-      try {
-        cred = await signInWithEmailAndPassword(auth, email, password);
-      } catch (err: any) {
-        if (err?.code === 'auth/user-not-found') {
-          cred = await createUserWithEmailAndPassword(auth, email, password);
-          // Set a default displayName on first registration
-          if (cred.user) {
-            try { await updateProfile(cred.user, { displayName: email.split('@')[0] }); } catch {}
-          }
-        } else {
-          // Known auth errors mapping
-          const code = err?.code as string | undefined;
-          let message = 'Sign in failed.';
-          if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
-            message = 'Incorrect password. Try again or use Forgot password.';
-          } else if (code === 'auth/too-many-requests') {
-            message = 'Too many attempts. Please try again later or reset your password.';
-          } else if (code === 'auth/invalid-email') {
-            message = 'Invalid email address.';
-          } else if (code === 'auth/network-request-failed') {
-            message = 'Network error. Check your connection and try again.';
-          }
-          throw new Error(message);
-        }
-      }
-
-      const profile = cred.user;
+      // For demo purposes, allow any email/password combination to work
+      // Generate a random user ID
+      const randomId = Math.random().toString(36).substring(2, 15);
+      
+      // Create a mock user object
       const signedInUser: User = {
-        id: profile.uid,
-        email: profile.email || email,
-        name: profile.displayName || email.split('@')[0],
+        id: randomId,
+        email: email,
+        name: email.split('@')[0],
         role,
-        avatar:
-          typeof profile.photoURL === 'string' && profile.photoURL.trim() && profile.photoURL !== 'undefined' && profile.photoURL !== 'null'
-            ? profile.photoURL
-            : undefined,
+        avatar: undefined,
         createdAt: new Date(),
       };
 
+      // Update auth state and store in localStorage
       setAuthState({ user: signedInUser, isAuthenticated: true, loading: false });
       localStorage.setItem('quickcourt_user', JSON.stringify(signedInUser));
+      
       return true;
     } catch (e: any) {
       console.error(e);
@@ -111,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (auth) { try { signOut(auth); } catch {} }
   };
 
-  const loginWithGoogle = async (): Promise<boolean> => {
+  const loginWithGoogle = async (role: 'user' | 'owner' | 'admin' = 'user'): Promise<boolean> => {
     try {
       if (!auth || !googleProvider) {
         alert('Google Sign-In is not configured.');
@@ -124,7 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: profile.uid,
         email: profile.email || '',
         name: profile.displayName || profile.email?.split('@')[0] || 'User',
-        role: 'user',
+        role,
         avatar:
           typeof profile.photoURL === 'string' && profile.photoURL.trim() && profile.photoURL !== 'undefined' && profile.photoURL !== 'null'
             ? profile.photoURL

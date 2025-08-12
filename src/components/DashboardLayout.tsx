@@ -1,24 +1,36 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, MoreVertical } from 'lucide-react';
 import { Logo } from './Logo';
+import { ChatbotAI } from './ChatbotAI';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebar: React.ReactNode;
+  sidebarOpen: boolean;
+  onToggleSidebar: () => void;
+  showChatbot?: boolean;
 }
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, sidebar }) => {
+export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, sidebar, sidebarOpen, onToggleSidebar, showChatbot = false }) => {
   const { user, logout } = useAuth();
 
   return (
-    <div className="min-h-screen bg-transparent">
+    <div className="min-h-screen bg-black">
       {/* Header */}
-      <header className="bg-white/60 backdrop-blur-md shadow-md border-b border-white/20">
+      <header className="bg-black/90 backdrop-blur-md shadow-md border-b border-white/20">
         <div className="container-pro">
           <div className="flex justify-between items-center h-16">
-            <Logo size="sm" />
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={onToggleSidebar}
+                className="p-2 text-white hover:text-blue-300 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <MoreVertical size={20} />
+              </button>
+              <Logo size="sm" />
+            </div>
             
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
@@ -38,15 +50,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, side
                     <User size={16} className="text-gray-600" />
                   </div>
                 )}
-                <span className="text-sm font-medium text-gray-700">{user?.name}</span>
-                <span className="text-xs bg-gray-100 px-2 py-1 rounded-full text-gray-600 capitalize">
+                <span className="text-sm font-medium text-white">{user?.name}</span>
+                <span className="text-xs bg-blue-600 px-2 py-1 rounded-full text-white capitalize">
                   {user?.role}
                 </span>
               </div>
               
               <button
                 onClick={logout}
-                className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                className="flex items-center space-x-1 px-3 py-2 text-sm text-white hover:text-red-300 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <LogOut size={16} />
                 <span>Logout</span>
@@ -58,22 +70,35 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, side
 
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-64 bg-white/50 backdrop-blur-md shadow-lg min-h-screen border-r border-white/20">
-          {sidebar}
-        </div>
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 256, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="bg-black/90 backdrop-blur-md shadow-lg min-h-screen border-r border-white/20 overflow-hidden"
+            >
+              {sidebar}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto bg-black">
           <motion.main
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="p-6"
+            className="p-6 min-h-screen"
           >
             {children}
           </motion.main>
         </div>
       </div>
+      
+      {/* AI Chatbot */}
+      {showChatbot && <ChatbotAI />}
     </div>
   );
 };

@@ -7,6 +7,7 @@ export interface User {
   phone?: string;
   favoriteSports?: string[];
   createdAt: Date;
+  status?: 'active' | 'banned';
 }
 
 export interface Facility {

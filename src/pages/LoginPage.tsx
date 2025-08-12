@@ -16,9 +16,20 @@ export const LoginPage: React.FC = () => {
     password: '',
   });
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!role || !['user', 'owner', 'admin'].includes(role)) return;
+
+    // Validate email format
+    if (!validateEmail(formData.email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
 
     setIsLoading(true);
     
@@ -75,7 +86,14 @@ export const LoginPage: React.FC = () => {
 
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">{getRoleTitle()}</h1>
-            <p className="text-gray-400">Enter your credentials to access your dashboard</p>
+            <p className="text-gray-400">
+              {role === 'user' 
+                ? 'Book courts, join games, and track your sports activities' 
+                : role === 'owner' 
+                ? 'Manage your facilities, view bookings, and handle operations'
+                : 'Enter your credentials to access your dashboard'
+              }
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
@@ -153,28 +171,74 @@ export const LoginPage: React.FC = () => {
               </button>
             </div>
 
-            {role === 'user' && (
+            {(role === 'user' || role === 'owner' || role === 'admin') && (
               <div className="pt-2">
                 <button
                   type="button"
                   onClick={async () => {
                     setIsLoading(true);
-                    const ok = await loginWithGoogle();
+                    const ok = await loginWithGoogle(role as 'user' | 'owner' | 'admin');
                     setIsLoading(false);
-                    if (ok) navigate('/dashboard/user');
+                    if (ok) navigate(`/dashboard/${role}`);
                   }}
                   className="w-full flex items-center justify-center gap-2 border border-gray-300 bg-white text-gray-800 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <FcGoogle size={20} />
                   Continue with Google
                 </button>
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  {role === 'owner' ? 'Sign in as Facility Owner' : role === 'admin' ? 'Sign in as Administrator' : 'Sign in as Player'}
+                </p>
+              </div>
+            )}
+
+            {role === 'user' && (
+              <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                <h3 className="text-blue-300 font-semibold text-sm mb-2">🎾 Quick Start for Players</h3>
+                <ul className="text-xs text-blue-200 space-y-1">
+                  <li>• Browse available sports facilities</li>
+                  <li>• Book courts with instant confirmation</li>
+                  <li>• Join group games and tournaments</li>
+                  <li>• Track your booking history</li>
+                </ul>
+              </div>
+            )}
+
+            {role === 'owner' && (
+              <div className="mt-4 p-4 bg-green-900/20 border border-green-500/30 rounded-lg">
+                <h3 className="text-green-300 font-semibold text-sm mb-2">🏢 Facility Management Tools</h3>
+                <ul className="text-xs text-green-200 space-y-1">
+                  <li>• Manage your sports facilities</li>
+                  <li>• View and approve bookings</li>
+                  <li>• Track revenue and analytics</li>
+                  <li>• Handle customer inquiries</li>
+                </ul>
+              </div>
+            )}
+
+            {role === 'admin' && (
+              <div className="mt-4 p-4 bg-orange-900/20 border border-orange-500/30 rounded-lg">
+                <h3 className="text-orange-300 font-semibold text-sm mb-2">⚙️ Administrative Controls</h3>
+                <ul className="text-xs text-orange-200 space-y-1">
+                  <li>• Manage all facilities and users</li>
+                  <li>• Monitor system analytics</li>
+                  <li>• Handle disputes and support</li>
+                  <li>• System configuration and settings</li>
+                </ul>
               </div>
             )}
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-400 text-sm">
-              Demo credentials: Use any email/password combination
+              {role === 'user' 
+                ? 'Demo: Use any email/password or Google sign-in to start booking courts'
+                : role === 'owner'
+                ? 'Demo: Use any email/password or Google sign-in to manage facilities'
+                : role === 'admin'
+                ? 'Demo: Use any email/password or Google sign-in for administrative access'
+                : 'Demo credentials: Use any email/password combination'
+              }
             </p>
           </div>
         </div>

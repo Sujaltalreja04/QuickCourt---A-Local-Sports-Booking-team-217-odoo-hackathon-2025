@@ -4,6 +4,8 @@ import { Users, Building2, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from '../components/Logo';
 import { RoleCard } from '../components/RoleCard';
+import { HeroSection } from '../components/HeroSection';
+import { PremiumNavigation } from '../components/PremiumNavigation';
 
 export const LandingPage: React.FC = () => {
   const [showRoles, setShowRoles] = useState(false);
@@ -42,8 +44,27 @@ export const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-6">
-      <div className="max-w-6xl mx-auto text-center">
+    <div className="min-h-screen">
+      {/* Premium Navigation */}
+      <PremiumNavigation
+        ctaText="GET STARTED"
+        ctaAction={() => setShowRoles(true)}
+        showCart={false}
+        showSearch={false}
+      />
+      
+      {/* Hero Section */}
+      <HeroSection
+        title="MAKE YOUR GAME"
+        subtitle="The academy offers everything you need to become the best!"
+        ctaText="JOIN OUR CLUB"
+        ctaAction={() => window.open('https://discord.gg/HUXVsksx', '_blank')}
+        backgroundImage="https://images.pexels.com/photos/573945/pexels-photo-573945.jpeg"
+      />
+      
+      {/* Role Selection Section */}
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-6">
+        <div className="max-w-6xl mx-auto text-center">
         <AnimatePresence mode="wait">
           {!showRoles ? (
             <motion.div
@@ -107,6 +128,7 @@ export const LandingPage: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
     </div>
   );

@@ -35,15 +35,15 @@ export const Logo: React.FC<LogoProps> = ({ size = 'md', animate = false }) => {
 
   return (
     <motion.div
-      className={`font-bold ${sizeClasses[size]} text-transparent bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 bg-clip-text`}
+      className={`font-bold ${sizeClasses[size]} text-transparent bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-500 bg-clip-text`}
       variants={animate ? logoVariants : {}}
       initial={animate ? "hidden" : "visible"}
       animate={animate ? ["visible", "pulse"] : "visible"}
       style={{
-        filter: animate ? 'drop-shadow(0 0 20px rgba(0, 212, 255, 0.3))' : 'none'
+        filter: animate ? 'drop-shadow(0 0 20px rgba(16, 185, 129, 0.4))' : 'none'
       }}
     >
-      Quick<span className="text-green-400">Court</span>
+      Quick<span className="text-orange-400">Court</span>
     </motion.div>
   );
 };
